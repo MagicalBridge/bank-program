@@ -107,7 +107,7 @@ pub mod solana_bank {
 #[derive(Accounts)]
 pub struct Initialize<'info> {
     #[account(
-        init,
+        init_if_needed,
         payer = owner,
         space = 8 + 32 + 8,
         seeds = [b"bank"],
