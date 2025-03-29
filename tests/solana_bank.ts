@@ -9,9 +9,10 @@ describe("solana_bank", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const program = anchor.workspace.SolanaBank as Program<SolanaBank>;
+  // 获取provider
   const provider = anchor.getProvider();
 
-  // 生成银行PDA地址
+  // 生成银行PDA地址, 第一个参数是种子，第二个参数是程序ID
   const [bankPDA] = PublicKey.findProgramAddressSync(
     [Buffer.from("bank")],
     program.programId
