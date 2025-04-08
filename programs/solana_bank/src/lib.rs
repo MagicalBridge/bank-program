@@ -8,7 +8,7 @@ pub mod solana_bank {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        msg!("Initializing bank contract");
+        msg!("Initializing bank program");
         let bank = &mut ctx.accounts.bank;
         bank.owner = ctx.accounts.owner.key();
         bank.total_balance = 0;
@@ -25,15 +25,15 @@ pub mod solana_bank {
         require!(amount >= MIN_DEPOSIT, BankError::DepositTooSmall);
 
         let transfer_instruction = system_instruction::transfer(
-            &ctx.accounts.user.key(),
-            &ctx.accounts.bank.key(),
-            amount,
+            &ctx.accounts.user.key(), // 转出账户
+            &ctx.accounts.bank.key(), // 转入账户
+            amount, // 转账金额
         );
 
         anchor_lang::solana_program::program::invoke(
             &transfer_instruction,
             &[
-                ctx.accounts.user.to_account_info(),
+                ctx.accounts.user.to_account_info(), // to_account_info 用来获取账户信息
                 ctx.accounts.bank.to_account_info(),
                 ctx.accounts.system_program.to_account_info(),
             ],
@@ -116,12 +116,16 @@ pub struct Initialize<'info> {
     pub bank: Account<'info, Bank>,
     #[account(mut)]
     pub owner: Signer<'info>,
-    pub system_program: Program<'info, System>,
+    pub system_program: Program<'info, System>, // 涉及账户创建的操作，需要提供系统程序
 }
 
 #[derive(Accounts)]
 pub struct Deposit<'info> {
-    #[account(mut, seeds = [b"bank"], bump)]
+    #[account(
+        mut, 
+        seeds = [b"bank"],
+        bump
+    )]
     pub bank: Account<'info, Bank>,
     #[account(
         init_if_needed,
